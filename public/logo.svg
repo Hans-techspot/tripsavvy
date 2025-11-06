@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60" role="img" aria-labelledby="logo-title">
+  <title id="logo-title">TripAI - AI-Powered Travel Planning Logo</title>
+  <defs>
+    <style>
+      .text { font-family: 'Inter', sans-serif; font-weight: 700; fill: #2563eb; }
+      .plane { fill: #10b981; }
+    </style>
+  </defs>
+  <!-- Simple plane icon -->
+  <path class="plane" d="M20 30 L40 20 L50 20 L35 30 L50 40 L40 40 Z M35 30 L50 25 L55 30 L50 35 Z"/>
+  <!-- TripAI text -->
+  <text x="70" y="35" class="text" font-size="24">TripAI</text>
+</svg>
