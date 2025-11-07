@@ -57,8 +57,8 @@ export default function TripDetailPage() {
   const fetchTripData = async () => {
     try {
       // Fetch trip
-      const trips = await getRecords('trips');
-      const tripData = trips.find((t: any) => t.id === id);
+      const tripsResponse = await getRecords('trips');
+      const tripData = tripsResponse.records.find((t: any) => t.id === id);
       if (!tripData) {
         router.push('/');
         return;
@@ -66,17 +66,17 @@ export default function TripDetailPage() {
       setTrip(tripData);
 
       // Fetch itinerary
-      const itineraries = await getRecords('itineraries');
-      const itineraryData = itineraries.find((i: any) => i.trip_id === id);
+      const itinerariesResponse = await getRecords('itineraries');
+      const itineraryData = itinerariesResponse.records.find((i: any) => i.trip_id === id);
       setItinerary(itineraryData);
 
       // Fetch expenses
-      const expensesData = await getRecords('expenses');
-      setExpenses(expensesData.filter((e: any) => e.trip_id === id));
+      const expensesResponse = await getRecords('expenses');
+      setExpenses(expensesResponse.records.filter((e: any) => e.trip_id === id));
 
       // Fetch budget categories
-      const budgetData = await getRecords('budget_categories');
-      setBudgetCategories(budgetData.filter((b: any) => b.trip_id === id));
+      const budgetResponse = await getRecords('budget_categories');
+      setBudgetCategories(budgetResponse.records.filter((b: any) => b.trip_id === id));
     } catch (error) {
       console.error('Error fetching trip data:', error);
     } finally {
