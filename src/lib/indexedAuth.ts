@@ -9,6 +9,13 @@ interface User {
   created_at: Date;
 }
 
+interface PublicUser {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url?: string;
+}
+
 interface AuthResponse {
   user: {
     id: string;
@@ -66,7 +73,7 @@ class IndexedAuth {
     return `demo_token.${payload}`;
   }
 
-  private verifyToken(token: string): { userId: string } | null {
+  private parseToken(token: string): { userId: string } | null {
     try {
       const parts = token.split('.');
       if (parts.length !== 2) return null;
@@ -161,8 +168,8 @@ class IndexedAuth {
     };
   }
 
-  async verifyToken(token: string): Promise<{ valid: boolean; user?: User }> {
-    const tokenData = this.verifyToken(token);
+  async verifyToken(token: string): Promise<{ valid: boolean; user?: PublicUser }> {
+    const tokenData = this.parseToken(token);
     if (!tokenData) {
       return { valid: false };
     }
@@ -188,7 +195,7 @@ class IndexedAuth {
   }
 
   async refreshToken(refresh_token: string): Promise<AuthResponse> {
-    const tokenData = this.verifyToken(refresh_token);
+    const tokenData = this.parseToken(refresh_token);
     if (!tokenData) {
       throw new Error('Invalid refresh token');
     }
