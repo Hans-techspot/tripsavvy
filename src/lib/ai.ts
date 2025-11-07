@@ -35,6 +35,32 @@ export interface ItineraryResponse {
   tips: string[];
 }
 
+// Helper function to extract JSON from AI response text
+function extractJsonFromText(text: string): any {
+  // Try direct parsing first
+  try {
+    return JSON.parse(text);
+  } catch {
+    // If direct parsing fails, try to extract JSON from text
+    // Look for JSON object/array patterns
+    const jsonMatch = text.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[0]);
+      } catch {
+        // If still fails, try to clean up the JSON
+        const cleanedJson = jsonMatch[0]
+          .replace(/[\u201C\u201D]/g, '"') // Smart quotes
+          .replace(/[\u2018\u2019]/g, "'") // Smart apostrophes
+          .replace(/\n/g, ' ') // Remove newlines within strings
+          .replace(/\s+/g, ' '); // Normalize whitespace
+        return JSON.parse(cleanedJson);
+      }
+    }
+    throw new Error('No valid JSON found in response');
+  }
+}
+
 export async function generateItinerary(tripDetails: TripDetails): Promise<ItineraryResponse> {
   const prompt = `Generate a detailed travel itinerary for a trip to ${tripDetails.destination} from ${tripDetails.startDate} to ${tripDetails.endDate}.
 
@@ -82,7 +108,9 @@ Focus on:
 - Local experiences and culture
 - Weather-appropriate activities
 - Group size considerations
-- Balance between popular attractions and hidden gems`;
+- Balance between popular attractions and hidden gems
+
+IMPORTANT: Respond ONLY with valid JSON. Do not include any text before or after the JSON.`;
 
   const response = await fetch('https://api.a0.dev/ai/llm', {
     method: 'POST',
@@ -93,7 +121,7 @@ Focus on:
       messages: [
         {
           role: 'system',
-          content: 'You are a travel planning expert. Generate detailed, realistic itineraries based on user preferences.'
+          content: 'You are a travel planning expert. Generate detailed, realistic itineraries based on user preferences. Always respond with valid JSON only.'
         },
         {
           role: 'user',
@@ -114,8 +142,9 @@ Focus on:
   }
 
   try {
-    return JSON.parse(content);
+    return extractJsonFromText(content);
   } catch (error) {
+    console.error('AI Response Content:', content);
     throw new Error('Invalid AI response format');
   }
 }
